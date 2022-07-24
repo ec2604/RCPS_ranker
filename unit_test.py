@@ -1,7 +1,7 @@
 import numpy as np
 from concentration_inequalities import find_tightest_lambda
 from svm_model import SvmRanking
-from logistic_regression_model import LogisticRanking
+from ranking_model import LogisticRanking, DecisionTreeRanking
 
 def lambda_wrapper(lmbd):
     def predict():
@@ -31,8 +31,9 @@ def evaluator(lmbd):
     return rank_loss(model.X_val, prediction_set)
 
 if __name__ == '__main__':
-    model = LogisticRanking()
+    # model = LogisticRanking()
     # model = SvmRanking()
+    model = DecisionTreeRanking()
     model.train_model()
     min_lambda = find_tightest_lambda(100, 0.01, 5, evaluator)
     print('#############################################################################')
