@@ -25,7 +25,7 @@ def maurer(nu, alpha, r_lambda, n):
 
 
 def hbm(n, r_lambda, alpha, delta):
-    m = np.floor(n/2)
+    m = np.floor(n / 2)
     nh_res = naive_hoeffding(m, r_lambda, alpha)
     bentkus_res = bentkus(m, alpha, r_lambda)
     curr_maurer = lambda nu: maurer(nu, alpha, r_lambda, n)
@@ -37,14 +37,17 @@ def rcps_lambda(n, alpha, lmbd, risk_evaluator, delta):
     r_lambda = risk_evaluator(lmbd)
     return hbm(n, r_lambda, alpha, delta)
 
-def find_lambda_ucb(n, lmbda, risk_evaluator, delta):
-    optimized_func = lambda alpha: rcps_lambda(n, alpha, lmbda, risk_evaluator, delta)
-    return brentq(optimized_func, 1e-10, 1-1e-10)
 
-def find_tighest_lambda(n, delta, req_alpha, risk_evaluator):
+def find_lambda_ucb(n, lmbd, risk_evaluator, delta):
+    optimized_func = lambda alpha: rcps_lambda(n, alpha, lmbd, risk_evaluator, delta)
+    return brentq(optimized_func, 1e-10, 1 - 1e-10)
+
+
+def find_tightest_lambda(n, delta, req_alpha, risk_evaluator):
     lambdas = np.linspace(2, 10, 100)
     min_lambda = 10
     for lmbd in lambdas:
+        print(f'lambda={lmbd}')
         alpha = find_lambda_ucb(n, lmbd, risk_evaluator, delta)
         if alpha < req_alpha:
             min_lambda = lmbd
