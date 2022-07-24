@@ -193,19 +193,19 @@ class MovieData:
 
     def get_train_and_validation_data(self):
         X = self.events_data.loc[:, self.feature_columns].values.astype(np.float32)
-        print('overall input shape: ' + str(X.shape))
+        # print('overall input shape: ' + str(X.shape))
 
         y = self.events_data.loc[:, ['outcome']].values.astype(np.float32).ravel()
-        print('overall output shape: ' + str(y.shape))
+        # print('overall output shape: ' + str(y.shape))
 
         self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(X, y,
                                                                               test_size=0.2,
                                                                               random_state=42)
-        print('training input shape: ' + str(self.X_train.shape))
-        print('training output shape: ' + str(self.y_train.shape))
-
-        print('testing input shape: ' + str(self.X_val.shape))
-        print('testing output shape: ' + str(self.y_val.shape))
+        # print('training input shape: ' + str(self.X_train.shape))
+        # print('training output shape: ' + str(self.y_train.shape))
+        #
+        # print('testing input shape: ' + str(self.X_val.shape))
+        # print('testing output shape: ' + str(self.y_val.shape))
 
         return self.X_train, self.X_val, self.y_train, self.y_val
 

@@ -47,7 +47,7 @@ def find_tightest_lambda(n, delta, req_alpha, risk_evaluator):
     lambdas = np.linspace(2, 10, 100)
     min_lambda = 10
     for lmbd in lambdas:
-        print(f'lambda={lmbd}')
+        # print(f'lambda={lmbd}')
         alpha = find_lambda_ucb(n, lmbd, risk_evaluator, delta)
         if alpha < req_alpha:
             min_lambda = lmbd
