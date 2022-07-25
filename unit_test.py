@@ -17,8 +17,8 @@ def lambda_wrapper(lmbd):
 
 
 def rank_loss(label, prediction_set):
-    r_loss = (((label[:, 0] > 0) * (np.min(prediction_set, axis=1) < 0))).sum() + (
-                ((label[:, 0] < 0) * (np.max(prediction_set, axis=1) > 0))).sum()
+    r_loss = ((((label > 0) * (np.max(prediction_set, axis=1) < 0))).sum() + (
+                ((label < 0) * (np.min(prediction_set, axis=1) > 0))).sum()) / len(label)
     # print(f'r_loss={r_loss}')
     return r_loss
 
@@ -28,14 +28,14 @@ def evaluator(lmbd):
     # print(f'data_valid.shape={data_valid.shape}')
     predict = lambda_wrapper(lmbd)
     prediction_set = predict()
-    return rank_loss(model.X_val, prediction_set)
+    return rank_loss(model.y_val, prediction_set)
 
 if __name__ == '__main__':
-    # model = LogisticRanking()
+    model = LogisticRanking()
     # model = SvmRanking()
-    model = DecisionTreeRanking()
+    # model = DecisionTreeRanking()
     model.train_model()
-    min_lambda = find_tightest_lambda(100, 0.01, 5, evaluator)
+    min_lambda = find_tightest_lambda(26048, 0.1, 0.05, evaluator)
     print('#############################################################################')
     print(f'min_lambda={min_lambda}')
     print('#############################################################################')

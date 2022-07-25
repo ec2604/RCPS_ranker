@@ -8,12 +8,12 @@ def h_1(a, b):
 
 
 def naive_hoeffding(n, r_lambda, alpha):
-    return -n * h_1(np.max([r_lambda.astype(np.float), alpha]), alpha)
+    return -n * h_1(np.min([r_lambda.astype(np.float), alpha]), alpha)
 
 
 def bentkus(n, alpha, r_lambda):
     rv = binom(n, alpha)
-    return 1 + np.log(rv.cdf(np.ceil(n * r_lambda)))
+    return 1 + np.log(np.max([rv.cdf(np.ceil(n * r_lambda)),1e-10]))
 
 
 def g(nu):
@@ -21,12 +21,12 @@ def g(nu):
 
 
 def maurer(nu, alpha, r_lambda, n):
-    return (-n * nu / 2) * (alpha / (1 + 2 * g(nu)) - np.max([r_lambda, alpha]))
+    return (-n * nu / 2) * (alpha / (1 + 2 * g(nu)) - np.min([r_lambda, alpha]))
 
 
 def hbm(n, r_lambda, alpha, delta):
     m = np.floor(n / 2)
-    nh_res = naive_hoeffding(m, r_lambda, alpha)
+    nh_res = naive_hoeffding(m, np.max([r_lambda,1e-10]), alpha)
     bentkus_res = bentkus(m, alpha, r_lambda)
     curr_maurer = lambda nu: maurer(nu, alpha, r_lambda, n)
     maurer_res = fminbound(curr_maurer, 0, 1, full_output=True)[1]
@@ -40,16 +40,10 @@ def rcps_lambda(n, alpha, lmbd, risk_evaluator, delta):
 
 def find_lambda_ucb(n, lmbd, risk_evaluator, delta):
     optimized_func = lambda alpha: rcps_lambda(n, alpha, lmbd, risk_evaluator, delta)
-    return brentq(optimized_func, 1e-10, 1 - 1e-10)
+    res = brentq(optimized_func, 1e-10, 1-1e-12)
+    return res
 
 
 def find_tightest_lambda(n, delta, req_alpha, risk_evaluator):
-    lambdas = np.linspace(2, 10, 100)
-    min_lambda = 10
-    for lmbd in lambdas:
-        # print(f'lambda={lmbd}')
-        alpha = find_lambda_ucb(n, lmbd, risk_evaluator, delta)
-        if alpha < req_alpha:
-            min_lambda = lmbd
-            break
-    return min_lambda
+    lmbd = brentq(lambda lmbd: find_lambda_ucb(n, lmbd, risk_evaluator, delta) - req_alpha, 1e-10, 1.2)
+    return lmbd
