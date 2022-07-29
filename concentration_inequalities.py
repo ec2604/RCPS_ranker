@@ -6,7 +6,6 @@ from scipy.optimize import fminbound, brentq
 def h_1(a, b):
     return a * np.log(a / b) + (1 - a) * np.log((1 - a) / (1 - b))
 
-
 def naive_hoeffding(n, r_lambda, alpha):
     return -n * h_1(np.min([r_lambda.astype(np.float), alpha]), alpha)
 
@@ -25,6 +24,9 @@ def maurer(nu, alpha, r_lambda, n):
 
 
 def hbm(n, r_lambda, alpha, delta):
+    """
+    Calculates the Hoeffding-Bentkus-Maurer inequality for bounded U-statistics of order two
+    """
     m = np.floor(n / 2)
     nh_res = naive_hoeffding(m, np.max([r_lambda,1e-10]), alpha)
     bentkus_res = bentkus(m, alpha, r_lambda)
@@ -34,16 +36,26 @@ def hbm(n, r_lambda, alpha, delta):
 
 
 def rcps_lambda(n, alpha, lmbd, risk_evaluator, delta):
+    """
+    Calculates the empirical risk at lambda and calculates the HBM inequality
+    """
     r_lambda = risk_evaluator(lmbd)
     return hbm(n, r_lambda, alpha, delta)
 
 
 def find_lambda_ucb(n, lmbd, risk_evaluator, delta):
+    """
+    Inverts the tail bound, to get a pointwise UCB for the risk at lambda:
+    """
     optimized_func = lambda alpha: rcps_lambda(n, alpha, lmbd, risk_evaluator, delta)
     res = brentq(optimized_func, 1e-10, 1-1e-12)
     return res
 
 
 def find_tightest_lambda(n, delta, req_alpha, risk_evaluator):
-    lmbd = brentq(lambda lmbd: find_lambda_ucb(n, lmbd, risk_evaluator, delta) - req_alpha, 1e-10, 1.2)
+    """
+    Calculates the pointwise UCB for the risk at different lambda, and finds the lambda as the smallest value of lambda
+    such that the entire confidence region to the right of lambda falls below the target risk level alpha.
+    """
+    lmbd = brentq(lambda lmbd: find_lambda_ucb(n, lmbd, risk_evaluator, delta) - req_alpha, 1e-5, 1.2)
     return lmbd

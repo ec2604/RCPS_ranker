@@ -25,8 +25,6 @@ class User:
         return self.negative
 
 
-np.random.seed(1)
-
 
 class EventsGenerator:
     NUM_OF_OPENED_MOVIES_PER_USER = 20
@@ -109,6 +107,7 @@ class MovieData:
 
         self.X_train, self.y_train = None, None
         self.X_val, self.y_val = None, None
+        self.X_test, self.y_test = None, None
 
         self.create_movie_data()
         self.compute_price_and_buy_probability()
@@ -198,16 +197,18 @@ class MovieData:
         y = self.events_data.loc[:, ['outcome']].values.astype(np.float32).ravel()
         # print('overall output shape: ' + str(y.shape))
 
-        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(X, y,
-                                                                              test_size=0.2,
-                                                                              random_state=42)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y,
+                                                                              test_size=0.2)
+        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(self.X_train, self.y_train,
+                         test_size=0.25,
+                         )
         # print('training input shape: ' + str(self.X_train.shape))
         # print('training output shape: ' + str(self.y_train.shape))
         #
         # print('testing input shape: ' + str(self.X_val.shape))
         # print('testing output shape: ' + str(self.y_val.shape))
 
-        return self.X_train, self.X_val, self.y_train, self.y_val
+        return self.X_train, self.X_val, self.y_train, self.y_val, self.X_test, self.y_test
 
 
 if __name__ == '__main__':
