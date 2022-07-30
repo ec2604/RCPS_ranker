@@ -5,6 +5,7 @@ from scipy.stats import bernoulli
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
+
 def generate_university_ranking_data():
     np.random.seed(1)
     df = pd.read_csv('Times World University Rankings (2011-2016).csv')
@@ -26,6 +27,7 @@ def generate_university_ranking_data():
     data[:, 0] = data[:, 0] > 0
     np.save('./University_Rankings.npy', data)
 
+
 class UniversityRankingData:
     def __init__(self):
         self.data = np.load('./University_Rankings.npy')
@@ -35,11 +37,11 @@ class UniversityRankingData:
 
     def get_train_and_validation_data(self):
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.data[:, 1:], self.data[:, 0],
-                                                                              test_size=0.2,
-                                                                              )
-        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(self.X_train,  self.y_train,
-                                                                                test_size=0.25,
+                                                                                test_size=0.2,
                                                                                 )
+        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(self.X_train, self.y_train,
+                                                                              test_size=0.25,
+                                                                              )
         self.scaler = StandardScaler()
         self.X_train = self.scaler.fit_transform(self.X_train)
         self.X_val = self.scaler.transform(self.X_val)

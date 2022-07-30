@@ -6,13 +6,14 @@ from scipy.optimize import fminbound, brentq
 def h_1(a, b):
     return a * np.log(a / b) + (1 - a) * np.log((1 - a) / (1 - b))
 
+
 def naive_hoeffding(n, r_lambda, alpha):
     return -n * h_1(np.min([r_lambda.astype(np.float), alpha]), alpha)
 
 
 def bentkus(n, alpha, r_lambda):
     rv = binom(n, alpha)
-    return 1 + np.log(np.max([rv.cdf(np.ceil(n * r_lambda)),1e-10]))
+    return 1 + np.log(np.max([rv.cdf(np.ceil(n * r_lambda)), 1e-10]))
 
 
 def g(nu):
@@ -28,7 +29,7 @@ def hbm(n, r_lambda, alpha, delta):
     Calculates the Hoeffding-Bentkus-Maurer inequality for bounded U-statistics of order two
     """
     m = np.floor(n / 2)
-    nh_res = naive_hoeffding(m, np.max([r_lambda,1e-10]), alpha)
+    nh_res = naive_hoeffding(m, np.max([r_lambda, 1e-10]), alpha)
     bentkus_res = bentkus(m, alpha, r_lambda)
     curr_maurer = lambda nu: maurer(nu, alpha, r_lambda, n)
     maurer_res = fminbound(curr_maurer, 0, 1, full_output=True)[1]
@@ -48,7 +49,7 @@ def find_lambda_ucb(n, lmbd, risk_evaluator, delta):
     Inverts the tail bound, to get a pointwise UCB for the risk at lambda:
     """
     optimized_func = lambda alpha: rcps_lambda(n, alpha, lmbd, risk_evaluator, delta)
-    res = brentq(optimized_func, 1e-10, 1-1e-12)
+    res = brentq(optimized_func, 1e-10, 1 - 1e-12)
     return res
 
 

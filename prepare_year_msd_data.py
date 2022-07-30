@@ -2,8 +2,9 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
+
 def generate_year_msd_data():
-    #Assumes user has UCI dataset downloaded and unzipped.
+    # Assumes user has UCI dataset downloaded and unzipped.
     np.random.seed(1)
     df = pd.read_csv('YearPredictionMSD.txt', header=None)
     subset_idx = np.arange(len(df))
@@ -16,6 +17,7 @@ def generate_year_msd_data():
     data[:, 0] = data[:, 0] > 0
     np.save('./YearMSD_data.npy', data)
 
+
 class YearMSDData:
     def __init__(self):
         self.data = np.load('./YearMSD_data.npy')[:10000]
@@ -25,11 +27,11 @@ class YearMSDData:
 
     def get_train_and_validation_data(self):
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.data[:, 1:], self.data[:, 0],
-                                                                              test_size=0.2,
-                                                                              )
-        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(self.X_train,  self.y_train,
-                                                                                test_size=0.25,
+                                                                                test_size=0.2,
                                                                                 )
+        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(self.X_train, self.y_train,
+                                                                              test_size=0.25,
+                                                                              )
         self.scaler = StandardScaler()
         self.X_train = self.scaler.fit_transform(self.X_train)
         self.X_val = self.scaler.transform(self.X_val)
